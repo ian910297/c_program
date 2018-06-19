@@ -11,7 +11,7 @@ typedef struct __SINGLY_LIST {
 } SINGLY_LIST;
 
 typedef struct __TREE_NODE {
-    int value;
+    char data[STRING_LENGTH];
     struct __TREE_NODE *left;
     struct __TREE_NODE *right;
 } TREE_NODE;
