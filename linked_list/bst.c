@@ -3,7 +3,6 @@
 #include <string.h>
 #include "Node.h"
 
-TREE_NODE* Init();
 void Load();
 void Insert();
 void Search();
@@ -13,12 +12,12 @@ void bfs();
 
 int main(int argc, char *argv[]) {
     char *filename = argv[1];
-    TREE_NODE *root = Init();
+    TREE_NODE *root = NULL;
+    printf("The pointer of root address: %p\n", &root);
 
     printf("Load start\n");
-    Load(root, filename);
-
-    ShowDFS(root);
+    Load(&root, filename);
+    //ShowDFS(root);
 
     printf("Free start\n");
     FreeDFS(root);
@@ -27,35 +26,28 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-TREE_NODE* Init() {
-    TREE_NODE *root = malloc(sizeof(TREE_NODE));
-    root->data[0] = '\0';
-
-    return root;
-}
-
-void Load(TREE_NODE *root, char *filename) {
+void Load(TREE_NODE **root, char *filename) {
     FILE *fp;
     char data[STRING_LENGTH];
     fp = fopen(filename, "r");
 
+    printf("The pointer of pointer of address: %p\n", &root);
+
     while(fscanf(fp, "%s", data)!=EOF) {
-        Insert(root, data);
+        //printf("root value's address: %p\n", *root);
+        //printf("The pointer of root address: %p\n", &*root);
+        Insert(&*root, data);
     }
 
     fclose(fp);
 }
 
-void Insert(TREE_NODE *root, char data[STRING_LENGTH]) {
-    // First node
-    if(root->data[0]=='\0') {
-        strcpy(root->data, data);
-        return;
-    }
-
-    TREE_NODE *cur, *parent;
-    cur = root;
+void Insert(TREE_NODE **root, char data[STRING_LENGTH]) {
+    TREE_NODE *cur, *parent = NULL;
+    cur = *root;
     int cmp;
+
+    //printf("cur value's address: %p\n", cur);
 
     while(cur!=NULL) {
         parent = cur;
@@ -63,20 +55,19 @@ void Insert(TREE_NODE *root, char data[STRING_LENGTH]) {
 
         if(cmp<0) {
             cur = cur->left;
-        } else if(cmp>0) {
+        } else {
             cur = cur->right;
         }
-    }
-
-    if(cmp==0) {
-        return;
     }
 
     TREE_NODE *new = malloc(sizeof(TREE_NODE));
     strcpy(new->data, data);
     new->left = new->right = NULL;
 
-    if(cmp<0) {
+    if(parent==NULL) {// First node
+        printf("First Insert\n");
+        *root = new;
+    } else if(cmp<0) {
         parent->left = new;
     } else {
         parent->right = new;
